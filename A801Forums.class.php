@@ -53,7 +53,7 @@ class A801Forums
 		}
 	}
 
-	public function __unset()
+	public function __destruct()
 	{
 		curl_close($this->cURL);
 		unset($this->cURL);
