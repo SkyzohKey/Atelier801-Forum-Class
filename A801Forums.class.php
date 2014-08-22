@@ -21,15 +21,55 @@ class A801Forums
 		$this->cURLCookieJar = tempnam("/tmp", "CURLCOOKIE");
 
 		$this->cURL = curl_init();
-		curl_setopt($this->cURL, CURLOPT_COOKIEJAR, $this->cURLCookieJar);
-		curl_setopt($this->cURL, CURLOPT_COOKIEFILE, $this->cURLCookieJar);
+		$this->setOpt(CURLOPT_COOKIEJAR, $this->cURLCookieJar);
+		$this->setOpt(CURLOPT_COOKIEFILE, $this->cURLCookieJar);
 	}
 
+	/**
+	*	Private functions.
+	*	Used as helpers.
+	**/
 	private function setOpt($option, $value)
 	{
 		curl_setopt($this->cURL, $option, $value);
 	}
 
+	private function request($url, $curlOpt = null, $isPost = false, $postParams = null)
+	{
+		curl_close($this->cURL);
+
+		$this->cURL = curl_init();
+		$this->setOpt(CURLOPT_COOKIEJAR, $this->cURLCookieJar);
+		$this->setOpt(CURLOPT_COOKIEFILE, $this->cURLCookieJar);
+		$this->setOpt(CURLOPT_FOLLOWLOCATION, true);
+		// If you want to add headers : $this->setOpt(CURLOPT_HTTPHEADER, array("" => ""));
+
+		$this->setOpt(CURLOPT_URL, $url);
+
+		if ($curlOpt != null)
+		{
+			foreach ($curlOpt as $key => $value)
+				$this->setOpt($key, $value);
+		}
+
+		if ($isPost)
+		{
+			$this->setOpt(CURLOPT_POST, 1);
+			$this->setOpt(CURLOPT_POSTFIELDS, $postParams);
+		}
+
+		$exec = curl_exec($this->cURL);
+
+		$header_size = curl_getinfo($this->cURL, CURLINFO_HEADER_SIZE);
+		$header = substr($exec, 0, $header_size);
+		$body = substr($exec, $header_size);
+
+		return array($header, $body);
+	}
+
+	/**
+	*	Public functions.
+	**/
 	public function connect($userName = null, $userPass = null)
 	{
 		if ($userName != null || $userPass != null)
@@ -38,11 +78,10 @@ class A801Forums
 			$this->userpass = $userPass;
 		}
 
-		setOpt(CURLOPT_URL, $this->basePath . "/identification");
-		setOpt(CURLOPT_POST, 1);
-		setOpt(CURLOPT_POSTFIELDS, "id=" . $this->username . "&pass=" . $this->pass . "&" . $tokenName . "=" . $tokenValue);
+		$indexPage = $this->request($this->basePath);
+		return $indexPage;
 
-		if ($response = curl_exec($this->cURL))
+		/*if ($response = $this->request($this->basePath . "/identification", null, true, "id=" . $this->username . "&pass=" . $this->userpass . "&" . $tokenName . "=" . $tokenValue))
 		{
 			$json = json_decode($response);
 
@@ -50,7 +89,7 @@ class A801Forums
 				return true;
 			else
 				return false;
-		}
+		}*/
 	}
 
 	public function __destruct()
