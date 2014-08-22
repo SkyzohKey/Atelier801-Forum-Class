@@ -25,6 +25,12 @@ class A801Forums
 		$this->setOpt(CURLOPT_COOKIEFILE, $this->cURLCookieJar);
 	}
 
+	public function __destruct()
+	{
+		curl_close($this->cURL);
+		unset($this->cURL);
+	}
+
 	/**
 	*	Private functions.
 	*	Used as helpers.
@@ -90,11 +96,5 @@ class A801Forums
 			else
 				return false;
 		}*/
-	}
-
-	public function __destruct()
-	{
-		curl_close($this->cURL);
-		unset($this->cURL);
 	}
 }
