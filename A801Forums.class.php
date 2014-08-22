@@ -6,6 +6,8 @@
 *	@author 	Toonney
 **/
 
+require("simple_html_dom.class.php");
+
 class A801Forums
 {
 	// Declare and init vars.
@@ -13,12 +15,12 @@ class A801Forums
 	private $username, $userpass;
 	private $basePath = "http://www.atelier801.com";
 
-	public function __construct($userName, $userPass)
+	public function __construct($cookieJar, $userName, $userPass)
 	{
 		$this->username = $userName;
 		$this->userpass = $userPass;
 
-		$this->cURLCookieJar = tempnam("/tmp", "CURLCOOKIE");
+		$this->cURLCookieJar = $cookieJar;
 
 		$this->cURL = curl_init();
 		$this->setOpt(CURLOPT_COOKIEJAR, $this->cURLCookieJar);
@@ -70,7 +72,7 @@ class A801Forums
 		$header = substr($exec, 0, $header_size);
 		$body = substr($exec, $header_size);
 
-		return array($header, $body);
+		return $body;
 	}
 
 	/**
@@ -84,10 +86,15 @@ class A801Forums
 			$this->userpass = $userPass;
 		}
 
-		$indexPage = $this->request($this->basePath);
-		return $indexPage;
+		$indexPage = (string)$this->request($this->basePath);
 
-		/*if ($response = $this->request($this->basePath . "/identification", null, true, "id=" . $this->username . "&pass=" . $this->userpass . "&" . $tokenName . "=" . $tokenValue))
+		$html = new simple_html_dom();
+		$html->load($indexPage);
+
+		$tokenName = $html->find("input[type=hidden]", 1)->name;
+		$tokenValue = $html->find("input[type=hidden]", 1)->value;
+
+		if ($response = $this->request($this->basePath . "/identification", null, true, "id=" . $this->username . "&pass=" . $this->userpass . "&" . $tokenName . "=" . $tokenValue))
 		{
 			$json = json_decode($response);
 
@@ -95,6 +102,6 @@ class A801Forums
 				return true;
 			else
 				return false;
-		}*/
+		}
 	}
 }
