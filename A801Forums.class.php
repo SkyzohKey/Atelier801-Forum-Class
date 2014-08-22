@@ -6,8 +6,6 @@
 *	@author 	Toonney
 **/
 
-require("simple_html_dom.class.php");
-
 class A801Forums
 {
 	// Declare and init vars.
@@ -62,7 +60,7 @@ class A801Forums
 
 		if ($isPost)
 		{
-			$this->setOpt(CURLOPT_POST, 1);
+			$this->setOpt(CURLOPT_POST, true);
 			$this->setOpt(CURLOPT_POSTFIELDS, $postParams);
 		}
 
@@ -86,12 +84,9 @@ class A801Forums
 			$this->userpass = $userPass;
 		}
 
-		$indexPage = (string)$this->request($this->basePath);
+		$indexPage = (string)$this->request($this->basePath);		
 
-		$html = new simple_html_dom();
-		$html->load($indexPage);
-
-		$tokenName = $html->find("input[type=hidden]", 1)->name;
+		/*$tokenName = $html->find("input[type=hidden]", 1)->name;
 		$tokenValue = $html->find("input[type=hidden]", 1)->value;
 
 		if ($response = $this->request($this->basePath . "/identification", null, true, "id=" . $this->username . "&pass=" . $this->userpass . "&" . $tokenName . "=" . $tokenValue))
@@ -102,6 +97,6 @@ class A801Forums
 				return true;
 			else
 				return false;
-		}
+		}*/
 	}
 }

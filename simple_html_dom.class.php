@@ -68,24 +68,12 @@ define('MAX_FILE_SIZE', 600000);
 // -----------------------------------------------------------------------------
 // get html dom from file
 // $maxlen is defined in the code as PHP_STREAM_COPY_ALL which is defined as -1.
-function file_get_html($url, $use_post = 0, $use_post_fields = "", $use_include_path = false, $context=null, $offset = -1, $maxLen=-1, $lowercase = true, $forceTagsClosed=true, $target_charset = DEFAULT_TARGET_CHARSET, $stripRN=true, $defaultBRText=DEFAULT_BR_TEXT, $defaultSpanText=DEFAULT_SPAN_TEXT)
+function file_get_html($url, $use_include_path = false, $context=null, $offset = -1, $maxLen=-1, $lowercase = true, $forceTagsClosed=true, $target_charset = DEFAULT_TARGET_CHARSET, $stripRN=true, $defaultBRText=DEFAULT_BR_TEXT, $defaultSpanText=DEFAULT_SPAN_TEXT)
 {
 	// We DO force the tags to be terminated.
 	$dom = new simple_html_dom(null, $lowercase, $forceTagsClosed, $target_charset, $stripRN, $defaultBRText, $defaultSpanText);
-	// For sourceforge users: uncomment the next line and comment the retreive_url_contents line 2 lines down if it is not already done.	
-
-	// BAD : $contents = file_get_contents($url, $use_include_path, $context, $offset);
-	// Let's do something with cURL more powerfull :)
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_COOKIEJAR, "/tmp/cookieJar");
-	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_POST, $use_post);
-	curl_setopt($ch, CURLOPT_POSTFIELDS, $use_post_fields);
-
-	ob_start();      // prevent any output
-	$contents = curl_exec ($ch); // execute the curl command
-	ob_end_clean();  // stop preventing output
-
+	// For sourceforge users: uncomment the next line and comment the retreive_url_contents line 2 lines down if it is not already done.
+	$contents = file_get_contents($url, $use_include_path, $context, $offset);
 	// Paperg - use our own mechanism for getting the contents as we want to control the timeout.
 	//$contents = retrieve_url_contents($url);
 	if (empty($contents) || strlen($contents) > MAX_FILE_SIZE)
@@ -95,9 +83,6 @@ function file_get_html($url, $use_post = 0, $use_post_fields = "", $use_include_
 	// The second parameter can force the selectors to all be lowercase.
 	$dom->load($contents, $lowercase, $stripRN);
 	return $dom;
-
-	curl_close ($ch);
-	unset($ch);
 }
 
 // get html dom from string
