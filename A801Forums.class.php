@@ -13,7 +13,7 @@ class A801Forums
 	private $username, $userpass;
 	private $basePath = "http://www.atelier801.com";
 
-	public function __construct($userName = "Fish", $userPass = "Z9kYJII175NQEDYMQpkTELYhWQorahHkIqDJbEcTUdk=")
+	public function __construct($userName, $userPass)
 	{
 		$this->username = $userName;
 		$this->userpass = $userPass;
