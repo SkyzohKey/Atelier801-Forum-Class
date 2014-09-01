@@ -3,7 +3,6 @@
 *	Atelier801 Forums Class
 *	@version 	0.1
 *	@author 	Fish
-*	@author 	Toonney
 **/
 
 class A801Forums
@@ -45,6 +44,13 @@ class A801Forums
 		$this->cURL = curl_init();
 		$this->setOpt(CURLOPT_COOKIEJAR, $this->cURLCookieJar);
 		$this->setOpt(CURLOPT_COOKIEFILE, $this->cURLCookieJar);
+
+		if ($isPost)
+		{
+			$this->setOpt(CURLOPT_POST, true);
+			$this->setOpt(CURLOPT_POSTFIELDS, $postParams);
+		}
+
 		$this->setOpt(CURLOPT_COOKIESESSION, true);
 		$this->setOpt(CURLOPT_FOLLOWLOCATION, true);
 		$this->setOpt(CURLOPT_RETURNTRANSFER, true);
@@ -63,12 +69,6 @@ class A801Forums
 		{
 			foreach ($curlOpt as $key => $value)
 				$this->setOpt($key, $value);
-		}
-
-		if ($isPost)
-		{
-			$this->setOpt(CURLOPT_POST, true);
-			$this->setOpt(CURLOPT_POSTFIELDS, $postParams);
 		}
 
 		// Request it !
@@ -109,9 +109,11 @@ class A801Forums
 		$tokenValue = $matches[2];
 
 		// Post fields for the login request.
-		$fields = array("id" => $this->username,
+		/*$fields = array("id" => $this->username,
 						"pass" => $this->userpass,
-						$tokenName => $tokenValue);
+						$tokenName => $tokenValue);*/
+
+		$fields = "id=" . $this->username . "&pass=" . $this->userpass . "&" . $tokenName . "=" . $tokenValue;
 
 		// Let's log into.
 		$response = (string)$this->request($this->basePath . "/identification", null, true, $fields);
@@ -121,7 +123,7 @@ class A801Forums
 		*	Good ids : {"redirection":"http://atelier801.com/index"}
 		**/
 
-		return $return;
+		return $response;
 	}
 
 	public function disconnect()
