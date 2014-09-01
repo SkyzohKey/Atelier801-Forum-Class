@@ -3,7 +3,8 @@ Atelier801-Forum-Class
 
 A simple class to do basic operation through Atelier801 Forums. \o/
 
-=== Usage ===
+Usage
+-----
 ``` php
 <?php
 require_once("class/A801Forums.class.php");
