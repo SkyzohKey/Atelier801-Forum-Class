@@ -35,7 +35,7 @@ class A801Forums
 	private function setOpt($option, $value)
 	{
 		// Set a new option.
-		curl_setopt($this->cURL, $option, $value);
+		return curl_setopt($this->cURL, $option, $value);
 	}
 
 	private function request($url, $curlOpt = null, $isPost = true, $postParams = null)
@@ -44,13 +44,6 @@ class A801Forums
 		$this->cURL = curl_init();
 		$this->setOpt(CURLOPT_COOKIEJAR, $this->cURLCookieJar);
 		$this->setOpt(CURLOPT_COOKIEFILE, $this->cURLCookieJar);
-
-		if ($isPost)
-		{
-			$this->setOpt(CURLOPT_POST, true);
-			$this->setOpt(CURLOPT_POSTFIELDS, $postParams);
-		}
-
 		$this->setOpt(CURLOPT_COOKIESESSION, true);
 		$this->setOpt(CURLOPT_FOLLOWLOCATION, true);
 		$this->setOpt(CURLOPT_RETURNTRANSFER, true);
@@ -69,6 +62,12 @@ class A801Forums
 		{
 			foreach ($curlOpt as $key => $value)
 				$this->setOpt($key, $value);
+		}
+
+		if ($isPost)
+		{
+			$this->setOpt(CURLOPT_POST, 1);
+			$this->setOpt(CURLOPT_POSTFIELDS, $postParams);
 		}
 
 		// Request it !
@@ -113,7 +112,13 @@ class A801Forums
 						"pass" => $this->userpass,
 						$tokenName => $tokenValue);*/
 
-		$fields = "id=" . $this->username . "&pass=" . $this->userpass . "&" . $tokenName . "=" . $tokenValue;
+		//$fields = "id=" . $this->username . "&pass=" . $this->userpass . "&" . $tokenName . "=" . $tokenValue;
+
+		$fields["id"] = $this->username;
+		$fields["pass"] = $this->userpass;
+		$fields[$tokenName] = $tokenValue;
+
+		$fields = http_build_query($fields);
 
 		// Let's log into.
 		$response = (string)$this->request($this->basePath . "/identification", null, true, $fields);
